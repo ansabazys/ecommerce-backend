@@ -1,0 +1,23 @@
+import User from "../models/userModel.js";
+
+export const createUser = async (password, data) => {
+  return await User.create({ ...data, password });
+};
+
+export const inspectUser = async (data) => {
+  return await User.findOne({email: data.email});
+
+};
+
+export const getUsers = async () => {
+  return await User.find();
+};
+
+
+export const getUser = async (id) => {
+  return await User.findById(id)
+};
+
+export const uptUser = async (id, data) => {
+  return await User.findByIdAndUpdate(id, data)
+};
