@@ -6,30 +6,37 @@ import { checkAdmin, checkSuperAdmin } from "../middlewares/checkAuth.js";
 import { fetchUser, fetchUsers, updateUser } from "../controllers/userController.js";
 import { createCategory, deleteCategory, updateCategory } from "../controllers/categoryController.js";
 import { createProduct, deleteProduct, fetchProductDetails, fetchProducts, updateProduct } from "../controllers/productController.js";
+import upload from "../middlewares/multer.js";
 const router = express.Router();
 
 //admin
-router.post("/register", validateUser, checkSuperAdmin ,checkExist, registerAdmin);
-router.put("/update/:id", checkAdmin, updateAdmin);
 router.post("/login", validateUser, loginAdmin);
+router.post("/register", validateUser, checkSuperAdmin ,checkExist, registerAdmin);
 router.delete("/delete/:id", checkSuperAdmin ,deleteAdmin);
 
+
+//middlewa
+router.use(checkAdmin)
+
+router.put("/update/:id", updateAdmin);
+
+
 //user
-router.get("/users", checkAdmin, fetchUsers)
-router.get("/users/:id", checkAdmin, fetchUser)
-router.put("/users/:id", checkAdmin, updateUser)
+router.get("/users", fetchUsers)
+router.get("/users/:id", fetchUser)
+router.put("/users/:id", updateUser)
 
 //categories
-router.post("/categories", checkAdmin, createCategory)
-router.put("/categories/:id", checkAdmin, updateCategory)
-router.delete("/categories/:id", checkAdmin, deleteCategory)
+router.post("/categories", upload.single('image') ,createCategory)
+router.put("/categories/:id", updateCategory)
+router.delete("/categories/:id", deleteCategory)
 
 //products
-router.post("/products", checkAdmin, validateProduct ,createProduct)
-router.put("/products/:id", checkAdmin ,updateProduct)
-router.delete("/products/:id", checkAdmin ,deleteProduct)
-router.get("/products", checkAdmin, fetchProducts)
-router.get("/products/:id", checkAdmin, fetchProductDetails)
+router.post("/products/:id", validateProduct ,createProduct)
+router.put("/products/:id" ,updateProduct)
+router.delete("/products/:id" ,deleteProduct)
+router.get("/products", fetchProducts)
+router.get("/products/:id", fetchProductDetails)
 
 
 

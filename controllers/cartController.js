@@ -67,3 +67,35 @@ export const deleteCartItem = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const updateCartItem = async (req, res) => {
+  try {
+    const userId = req?.session?.user?._id;
+    // const {productId} = req.body  //implement frontend logic
+    const productId = req.params.id;
+    const cart = await getCart(userId);
+
+    const { quantity } = req.body;
+
+    if (quantity) {
+      cart.items.map( (item) => {
+        if(item.productId == productId) {
+          item.quantity = quantity
+        }
+      });
+    }
+
+    console.log(cart)
+
+    cart.totalAmount = cart.items.reduce((acc, curr) => {
+      acc += curr.price * curr.quantity;
+      return acc;
+    }, 0);
+
+    await cart.save();
+
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

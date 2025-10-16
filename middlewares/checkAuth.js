@@ -32,11 +32,12 @@ export const checkAdmin = (req, res, next) => {
 };
 
 export const checkSuperAdmin = (req, res, next) => {
-
+  console.log(req.session)
   try {
     if (req.session.admin.role === "superadmin") {
       return next();
     }
+    res.status(401).json({ message: "Not authorized, should be super admin" });
   } catch (error) {
     res.status(401).json({ message: "Not authorized" });
   }

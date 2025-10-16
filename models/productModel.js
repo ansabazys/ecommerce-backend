@@ -10,6 +10,11 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  images: [String],
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   price: {
     type: Number,
     required: true,
@@ -18,6 +23,14 @@ const productSchema = new mongoose.Schema({
     type: Number,
     min: 0,
   },
+  reviews: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  ],
   stockStatus: {
     type: String,
     enum: ["in stock", "out of stock"],
@@ -25,13 +38,18 @@ const productSchema = new mongoose.Schema({
   },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "categories",                         //TODO: fix the category issue
+    ref: "Category", //TODO: fix the category issue
+    required: true,
   },
   views: {
     type: Number,
-    default: 0
+    default: 0,
+  },
+  viewsId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "views", //TODO: fix the category issue
   }
 });
 
-const Product = mongoose.model("Product", productSchema)
-export default Product
+const Product = mongoose.model("Product", productSchema);
+export default Product;

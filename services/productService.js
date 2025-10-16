@@ -1,15 +1,19 @@
 import Product from "../models/productModel.js";
 
-export const create = async (data) => {
-  return await Product.create(data);
+export const create = async (data, id) => {
+  return await Product.create({categoryId: id, ...data});
 };
 
 export const getProducts = async () => {
-  return await Product.find();
+  return await Product.find({isDeleted: false});
 };
 
 export const getProduct = async (id) => {
   return await Product.findById(id);
+};
+
+export const getProductByCatId = async (id) => {
+  return await Product.find({categoryId: id})
 };
 
 export const getProductDetails = async (id) => {
@@ -36,5 +40,5 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  return await Product.findByIdAndDelete(id);
+  return await Product.findByIdAndUpdate(id, {isDeleted: true});
 };

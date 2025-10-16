@@ -4,6 +4,7 @@ import {
   getCates,
   updateCate,
 } from "../services/categoryService.js";
+import { getProductByCatId } from "../services/productService.js";
 
 export const getCategories = async (req, res) => {
   try {
@@ -15,7 +16,8 @@ export const getCategories = async (req, res) => {
 };
 export const createCategory = async (req, res) => {
   try {
-    await createCate(req.body);
+    const image = req.file?.filename
+    await createCate(req.body, image);
     res.status(201).json({ message: "category is created" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -35,6 +37,17 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const products = await getProductByCatId(id);
+    if (products.length > 0) {
+      return res
+        .status(409)
+        .json({
+          message:
+            "Category cannot be deleted because it has associated products",
+        });
+    }
+
     await deleteCate(id);
     res.status(200).json({ message: "category is deleted" });
   } catch (error) {

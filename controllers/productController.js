@@ -11,10 +11,11 @@ import { createViews } from "../services/viewsService.js";
 export const createProduct = async (req, res) => {
   try {
     const { stock } = req.body;
+    const {id} = req.params //category id
     stock > 0
       ? (req.body.stockStatus = "in stock")
       : (req.body.stockStatus = "out of stock");
-    const product = await create(req.body);
+    const product = await create(req.body, id);
     res.status(201).json({ message: "product created successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -24,7 +25,11 @@ export const createProduct = async (req, res) => {
 export const fetchProducts = async (req, res) => {
   try {
     const products = await getProducts(req.body);
-    res.status(200).json(products);
+    if(products.length > 0){
+       return res.status(200).json(products);
+    }
+
+     res.status(404).json({message: "No products"});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
