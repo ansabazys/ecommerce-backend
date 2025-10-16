@@ -39,10 +39,10 @@ export const updateAdmin = async (req, res) => {
 export const loginAdmin = async (req, res) => {
   try {
     const { password, email } = req.body;
+
     const admin = await inspectAdmin(email);
 
     const isMatch = await bcrypt.compare(password, admin.password);
-    console.log(isMatch)
     
     if (admin && isMatch) {
       req.session.admin = {

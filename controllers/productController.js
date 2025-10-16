@@ -41,6 +41,9 @@ export const fetchProduct = async (req, res) => {
     await getProduct(id);
     const viewsData = await createViews(id, req?.session?.user?._id); //views creation
     const product = await update(id, viewsData);
+    if(!product) {
+      return res.status(404).json({message: "Product not found!"})
+    }
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -32,7 +32,6 @@ export const checkAdmin = (req, res, next) => {
 };
 
 export const checkSuperAdmin = (req, res, next) => {
-  console.log(req.session)
   try {
     if (req.session.admin.role === "superadmin") {
       return next();

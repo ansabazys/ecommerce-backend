@@ -5,6 +5,7 @@ export const addToCart = async (req, res) => {
   try {
     const productId = req.params.id;
     const userId = req?.session?.user?._id;
+
     const cart = await getCart(userId);
     const product = await getProduct(productId);
     if (!cart) {
