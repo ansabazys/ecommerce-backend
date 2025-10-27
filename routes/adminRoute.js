@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteAdmin,
+  getCurrentAdmin,
   loginAdmin,
   registerAdmin,
   updateAdmin,
@@ -26,6 +27,7 @@ import {
   updateProduct,
 } from "../controllers/productController.js";
 import upload from "../middlewares/multer.js";
+import { adminGetOrders, getTotalRevenue } from "../controllers/orderController.js";
 const router = express.Router();
 
 //admin
@@ -39,10 +41,11 @@ router.post(
 );
 router.delete("/delete/:id", checkSuperAdmin, deleteAdmin);
 
-//middlewa
+//middleware
 router.use(checkAdmin);
 
 router.put("/update/:id", updateAdmin);
+router.get("/me", getCurrentAdmin);
 
 //user
 router.get("/users", fetchUsers);
@@ -65,5 +68,10 @@ router.put("/products/:id", updateProduct);
 router.delete("/products/:id", deleteProduct);
 router.get("/products", fetchProducts);
 router.get("/products/:id", fetchProductDetails);
+
+//orders
+router.get("/orders", adminGetOrders);
+router.get("/orders/totalrevenue", getTotalRevenue);
+
 
 export default router;

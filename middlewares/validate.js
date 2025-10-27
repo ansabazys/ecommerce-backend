@@ -1,14 +1,6 @@
 import { body, validationResult } from "express-validator";
 
 export const validateUser = [
-  body("name")
-    .trim()
-    .notEmpty()
-    .withMessage("Name is required")
-    .isLength({ min: 3 })
-    .withMessage("Name must be at least 5 characters long")
-    .matches(/^[a-zA-Z]/)
-    .withMessage("Name must not contain spaces or special characters"),
   body("email")
     .isEmail()
     .withMessage("Email must be valid email address")

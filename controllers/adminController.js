@@ -1,5 +1,6 @@
 import {
   create,
+  getAdmin,
   inspectAdmin,
   remove,
   update,
@@ -50,7 +51,7 @@ export const loginAdmin = async (req, res) => {
         name: admin.name,
         role: admin.role,
       };
-      return res.status(200).json({ message: "Logged in successfully" });
+      return res.status(200).json(admin);
     }
     res.status(401).json({ message: "Login failed" });
   } catch (error) {
@@ -68,5 +69,14 @@ export const deleteAdmin = async (req, res) => {
     res.status(200).json({ message: "admin deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const getCurrentAdmin = async (req, res) => {
+  try {
+    const admin = await getAdmin(req.session.admin._id);
+    res.status(200).json(admin)
+  } catch (error) {
+     res.status(500).json({ error: error.message });
   }
 };

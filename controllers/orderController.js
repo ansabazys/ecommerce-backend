@@ -1,5 +1,5 @@
 import { clearCart, getCart } from "../services/cartService.js";
-import { createOdr, getOdr, getOdrs } from "../services/orderService.js";
+import { createOdr, getOdr, getOdrs, getOrdersAdmin, totalRevenue } from "../services/orderService.js";
 import { getProduct } from "../services/productService.js";
 
 export const createOrder = async (req, res) => {
@@ -95,3 +95,24 @@ export const getOrders = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const adminGetOrders = async (req, res) => {
+  try {
+    const orders = await getOrdersAdmin();
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTotalRevenue = async (req, res) => {
+  try {
+    const total = await totalRevenue();
+    res.status(200).json(total);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+

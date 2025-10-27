@@ -14,6 +14,12 @@ export const inspectAdmin = async (data) => {
 
 }
 
+export const getAdmin = async (id) => {
+    return await Admin.findOne({_id: id})
+
+}
+
+
 export const remove = async (id) => {
     return await Admin.findByIdAndDelete(id)
 
