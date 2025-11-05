@@ -1,10 +1,14 @@
 import {
   createCate,
   deleteCate,
+  getCate,
   getCates,
   updateCate,
 } from "../services/categoryService.js";
-import { getProductByCatId } from "../services/productService.js";
+import {
+  categoryProducts,
+  getProductByCatId,
+} from "../services/productService.js";
 
 export const getCategories = async (req, res) => {
   try {
@@ -14,11 +18,28 @@ export const getCategories = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getCategoryProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const page = parseInt(req.query.page) || 1;
+
+    const [products, totalCount] = await categoryProducts(id, page);
+    console.log(totalCount)
+    const totalPages = Math.ceil(totalCount / 8)
+    res.status(200).json({products, totalPages});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const createCategory = async (req, res) => {
   try {
-    const image = req.file?.filename
-    await createCate(req.body, image);
-    res.status(201).json({ message: "category is created" });
+    const image = req.file?.filename;
+    const category = await createCate(req.body);
+    res
+      .status(201)
+      .json({ message: "category is created", category: category });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -27,8 +48,10 @@ export const createCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    await updateCate(id, req.body);
-    res.status(200).json({ message: "category is updated" });
+    const category = await updateCate(id, req.body);
+    res
+      .status(200)
+      .json({ message: "category is updated", category: category });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -38,14 +61,12 @@ export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const products = await getProductByCatId(id);
-    if (products.length > 0) {
-      return res
-        .status(409)
-        .json({
-          message:
-            "Category cannot be deleted because it has associated products",
-        });
+    const category = await getCate(id);
+    if (category.productsCount > 0) {
+      return res.status(409).json({
+        message:
+          "Category cannot be deleted because it has associated products",
+      });
     }
 
     await deleteCate(id);

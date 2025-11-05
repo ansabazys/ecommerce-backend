@@ -29,7 +29,22 @@ export const fetchUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    await uptUser(id, req.body);
+    const resp = await uptUser(id, req.body);
+    console.log(req.body);
+    res.status(200).json({ message: "user updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateByUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { status, ...rest } = req.body;
+
+    const resp = await uptUser(id, rest);
+    console.log(res);
     res.status(200).json({ message: "user updated successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -39,7 +54,7 @@ export const updateUser = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
   try {
     const user = await getUser(req.session.user._id);
-    res.status(200).json(user)
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -63,11 +78,15 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-
   try {
     const { password } = req.body;
     const user = await inspectUser(req.body);
     const isMatch = await bcrypt.compare(password, user.password);
+
+    if (user.status == "inactive") {
+      return res.status(401).json({ message: "Your account is disabled." });
+    }
+
     if (user && isMatch) {
       const { _id, name, email } = user;
       req.session.user = { _id, name, email };

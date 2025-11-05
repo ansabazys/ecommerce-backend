@@ -19,10 +19,16 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  stock: {
-    type: Number,
-    min: 0,
-  },
+  // sizes: {
+  //   type: Number,
+  //   min: 0,
+  // },
+  sizes: [
+    {
+      size: { type: String, required: true },
+      stock: { type: Number, default: 0 },
+    },
+  ],
   reviews: [
     {
       userId: {
@@ -48,8 +54,12 @@ const productSchema = new mongoose.Schema({
   viewsId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "views", //TODO: fix the category issue
-  }
-});
+  },
+}, {timestamps: true});
+
+
+productSchema.index({title: "text", description: "text"})
+
 
 const Product = mongoose.model("Product", productSchema);
 export default Product;

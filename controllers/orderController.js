@@ -1,6 +1,14 @@
 import { clearCart, getCart } from "../services/cartService.js";
-import { createOdr, getOdr, getOdrs, getOrdersAdmin, totalRevenue } from "../services/orderService.js";
+import {
+  createOdr,
+  getOdr,
+  getOdrs,
+  getOrdersAdmin,
+  orderByMonth,
+  totalRevenue,
+} from "../services/orderService.js";
 import { getProduct } from "../services/productService.js";
+import { getUser } from "../services/userService.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -10,18 +18,32 @@ export const createOrder = async (req, res) => {
       return res.status(404).json({ message: "cart is empty" });
     }
 
+    const { address, paymentMethod } = req.body;
+    const user = await getUser(userId);
     const { totalAmount, items } = cart;
 
+    user.address = address;
+
     const order = await createOdr(userId);
+
     order.items = items;
     order.totalAmount = totalAmount;
+    order.paymentMethod = paymentMethod;
+    order.address = user.address;
 
     order.items.map(async (item) => {
       try {
         const product = await getProduct(item.productId);
-        product.stock -= item.quantity;
 
-        product.stock > 0
+        product.sizes.map((size) => {
+          if (size.size == item.selectedSize) {
+            size.stock -= item.quantity;
+          }
+        });
+
+        const isStock = product.sizes.some((item) => item.stock > 0);
+
+        isStock
           ? (product.stockStatus = "in stock")
           : (product.stockStatus = "out of stock");
 
@@ -31,8 +53,12 @@ export const createOrder = async (req, res) => {
       }
     });
 
+    console.log(order);
+
+    await user.save();
     await order.save();
     cart.items = [];
+    cart.totalAmount = 0;
     await cart.save();
     res.status(201).json({ message: "Order is created" });
   } catch (error) {
@@ -114,5 +140,11 @@ export const getTotalRevenue = async (req, res) => {
   }
 };
 
-
-
+export const getOrderByMonth = async (req, res) => {
+  try {
+    const total = await orderByMonth();
+    res.status(200).json(total);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

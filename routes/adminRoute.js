@@ -27,7 +27,12 @@ import {
   updateProduct,
 } from "../controllers/productController.js";
 import upload from "../middlewares/multer.js";
-import { adminGetOrders, getTotalRevenue } from "../controllers/orderController.js";
+import {
+  adminGetOrders,
+  getOrderByMonth,
+  getTotalRevenue,
+  updateOrder,
+} from "../controllers/orderController.js";
 const router = express.Router();
 
 //admin
@@ -53,25 +58,21 @@ router.get("/users/:id", fetchUser);
 router.put("/users/:id", updateUser);
 
 //categories
-router.post("/categories", upload.single("image"), createCategory);
+router.post("/categories", createCategory);
 router.put("/categories/:id", updateCategory);
 router.delete("/categories/:id", deleteCategory);
 
 //products
-router.post(
-  "/products/:id",
-  validateProduct,
-  upload.array("image"),
-  createProduct
-);
-router.put("/products/:id", updateProduct);
-router.delete("/products/:id", deleteProduct);
+router.post("/products", upload.array("images", 5), createProduct);
+router.put("/products/:id", upload.array("images", 5), updateProduct);
+router.delete("/products/:id/:cid", deleteProduct);
 router.get("/products", fetchProducts);
 router.get("/products/:id", fetchProductDetails);
 
 //orders
 router.get("/orders", adminGetOrders);
+router.put("/orders/:id", updateOrder);
 router.get("/orders/totalrevenue", getTotalRevenue);
-
+router.get("/orders/orderByMonth", getOrderByMonth);
 
 export default router;

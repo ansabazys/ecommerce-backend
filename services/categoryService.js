@@ -1,7 +1,7 @@
 import Category from "../models/categoryModel.js";
 
-export const createCate = async (data, image) => {
-  return await Category.create({...data, image});
+export const createCate = async (data) => {
+  return await Category.create({ ...data });
 };
 
 export const updateCate = async (id, data) => {
@@ -15,3 +15,6 @@ export const getCates = async () => {
   return await Category.find();
 };
 
+export const getCate = async (id) => {
+  return await Category.findOne({ _id: id });
+};

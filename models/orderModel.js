@@ -16,9 +16,15 @@ const orderSchema = new mongoose.Schema(
     totalAmount: {
       type: Number,
     },
+    paymentMethod: {
+      type: String,
+    },
+    address: {
+      type: Object,
+    },
   },
   { timestamps: true }
 );
 
-const Order = mongoose.model("Order", orderSchema)
-export default Order
+const Order = mongoose.model("Order", orderSchema);
+export default Order;

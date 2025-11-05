@@ -2,6 +2,7 @@ import express from 'express'
 import { addToCart, deleteCartItem, getCartItems, updateCartItem } from '../controllers/cartController.js'
 import { checkUser } from '../middlewares/checkAuth.js'
 import { createOrder, getOrders, updateOrder } from '../controllers/orderController.js'
+import { updateByUser } from '../controllers/userController.js'
 
 const router = express.Router()
 
@@ -16,6 +17,8 @@ router.put("/cart/:id" ,updateCartItem)
 router.get("/orders", getOrders)
 router.post("/orders", createOrder)
 router.put("/orders/:id", updateOrder)
+
+router.put("/", updateByUser)
 
 
 export default router
