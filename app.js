@@ -30,7 +30,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: "mongodb://localhost:27017/ecommerce",
+      mongoUrl: process.env.MONGO_URL,
       collectionName: "sessions",
       ttl: 24 * 60 * 60,
     }),
