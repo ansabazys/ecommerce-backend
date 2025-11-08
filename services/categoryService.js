@@ -12,9 +12,9 @@ export const deleteCate = async (id) => {
 };
 
 export const getCates = async () => {
-  return await Category.find();
+  return await Category.find().sort({ createdAt: -1 });
 };
 
 export const getCate = async (id) => {
-  return await Category.findOne({ _id: id });
+  return await Category.findOne({ _id: id })
 };

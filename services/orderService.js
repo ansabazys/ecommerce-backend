@@ -16,7 +16,9 @@ export const upadteOrderStatus = async (id, data) => {
 };
 
 export const getOrdersAdmin = async () => {
-  return await Order.find().populate("userId", "name email");
+  return await Order.find()
+    .populate("userId", "name email")
+    .sort({ createdAt: -1 });
 };
 
 export const totalRevenue = async () => {

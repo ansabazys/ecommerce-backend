@@ -11,19 +11,16 @@ export const createCart = async (userId, product, size) => {
         selectedSize: size,
       },
     ],
-    totalAmount: product.price
-  })
+    totalAmount: product.price,
+  });
 };
 
 export const getCart = async (id) => {
-  return await Cart.findOne({ userId: id }).populate(
-    "items.productId",
-    "title images price categoryId sizes"
-  );
+  return await Cart.findOne({ userId: id })
+    .populate("items.productId", "title images price categoryId sizes")
+    .sort({ createdAt: -1 });
 };
 
 export const clearCart = async (id) => {
   return await Cart.findOneAndDelete({ userId: id });
 };
-
-

@@ -22,6 +22,8 @@ export const createOrder = async (req, res) => {
     const user = await getUser(userId);
     const { totalAmount, items } = cart;
 
+    console.log(address)
+
     user.address = address;
 
     const order = await createOdr(userId);

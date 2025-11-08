@@ -10,7 +10,7 @@ export const inspectUser = async (data) => {
 };
 
 export const getUsers = async () => {
-  return await User.find();
+  return await User.find().sort({ createdAt: -1 });
 };
 
 

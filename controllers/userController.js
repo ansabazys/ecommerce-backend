@@ -81,6 +81,7 @@ export const loginUser = async (req, res) => {
   try {
     const { password } = req.body;
     const user = await inspectUser(req.body);
+    if (!user) return res.status(401).json({ message: "login failed" });
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (user.status == "inactive") {
@@ -101,12 +102,14 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     if (req.session) {
+      const role = req.session.user?.role || req.session.admin?.role
+      console.log(role)
       req.session.destroy((err) => {
         if (err) {
           return res.status(500).json({ message: "Logout failed!" });
         }
         res.clearCookie("connect.sid");
-        res.status(200).json({ message: "Logout successfull!" });
+        res.status(200).json({ message: "Logout successfull!", role: role  });
       });
     } else {
       res.status(404).json({ message: "session not found" }); //

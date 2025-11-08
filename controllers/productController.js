@@ -70,7 +70,6 @@ export const fetchProduct = async (req, res) => {
 };
 
 export const fetchProductDetails = async (req, res) => {
-  //TODO add analatics
   try {
     const { id } = req.params;
     const product = await getProductDetails(id);
@@ -89,11 +88,14 @@ export const updateProduct = async (req, res) => {
       return { size: s.size, stock: parseInt(s.stock) };
     });
 
+    const product = await getProduct(id);
+    product.sizes = newSize;
+
+    product.save();
+
     const isStock = newSize.some((item) => item.stock > 0);
 
     let images = req.files.map((file) => file.filename);
-
-    console.log(images);
 
     isStock
       ? (rest.stockStatus = "in stock")

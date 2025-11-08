@@ -17,7 +17,10 @@ export const getCategories = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
+
+
+
 
 export const getCategoryProducts = async (req, res) => {
   try {
@@ -25,9 +28,9 @@ export const getCategoryProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
 
     const [products, totalCount] = await categoryProducts(id, page);
-    console.log(totalCount)
-    const totalPages = Math.ceil(totalCount / 8)
-    res.status(200).json({products, totalPages});
+
+    const totalPages = Math.ceil(totalCount / 8);
+    res.status(200).json({ products, totalPages });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -35,7 +38,9 @@ export const getCategoryProducts = async (req, res) => {
 
 export const createCategory = async (req, res) => {
   try {
-    const image = req.file?.filename;
+
+    const cate = await inspectCategory
+
     const category = await createCate(req.body);
     res
       .status(201)
