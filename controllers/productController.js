@@ -38,14 +38,16 @@ export const createProduct = async (req, res) => {
   }
 };
 
+
 export const fetchProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8 ;
 
-    const [products, totalCount] = await getProducts(page);
-    const totalPages = Math.ceil(totalCount / 8);
+    const [products, totalCount] = await getProducts(page, limit);
+    const totalPages = Math.ceil(totalCount / limit);
     if (products.length > 0) {
-      return res.status(200).json({ products, totalPages });
+      return res.status(200).json({ products, totalPages, totalCount });
     }
 
     res.status(404).json({ message: "No products" });

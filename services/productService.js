@@ -4,8 +4,7 @@ export const create = async ({ ...data }) => {
   return await Product.create(data);
 };
 
-export const getProducts = async (page) => {
-  const limit = 8;
+export const getProducts = async (page, limit) => {
   const skip = (page - 1) * limit;
 
   return Promise.all([

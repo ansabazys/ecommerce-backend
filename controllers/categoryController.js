@@ -3,6 +3,7 @@ import {
   deleteCate,
   getCate,
   getCates,
+  inspectCategory,
   updateCate,
 } from "../services/categoryService.js";
 import {
@@ -12,15 +13,20 @@ import {
 
 export const getCategories = async (req, res) => {
   try {
-    const categories = await getCates();
-    res.status(200).json(categories);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+
+    const [category, totalCount] = await getCates(page, limit);
+    const totalPages = Math.ceil(totalCount / limit);
+    if (totalCount > 0) {
+      return res.status(200).json({ category, totalPages, totalCount });
+    }
+
+    res.status(404).json({ message: "No Categories" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
-
-
-
+};
 
 export const getCategoryProducts = async (req, res) => {
   try {
@@ -38,8 +44,13 @@ export const getCategoryProducts = async (req, res) => {
 
 export const createCategory = async (req, res) => {
   try {
+    const { title } = req.body;
+    const cate = await inspectCategory(title);
 
-    const cate = await inspectCategory
+
+    if(cate) {
+      return res.status(409).json({error: "You cannot add same category!"})
+    }
 
     const category = await createCate(req.body);
     res

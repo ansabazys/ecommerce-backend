@@ -15,10 +15,18 @@ export const upadteOrderStatus = async (id, data) => {
   return await Order.findByIdAndUpdate(id, data);
 };
 
-export const getOrdersAdmin = async () => {
-  return await Order.find()
-    .populate("userId", "name email")
-    .sort({ createdAt: -1 });
+
+export const getOrdersAdmin = async (page, limit) => {
+  const skip = (page - 1) * limit;
+
+  return Promise.all([
+    Order.find()
+      .populate("userId", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Order.countDocuments(),
+  ]);
 };
 
 export const totalRevenue = async () => {

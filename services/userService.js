@@ -5,19 +5,23 @@ export const createUser = async (password, data) => {
 };
 
 export const inspectUser = async (data) => {
-  return await User.findOne({email: data.email})
-
+  return await User.findOne({ email: data.email });
 };
 
-export const getUsers = async () => {
-  return await User.find().sort({ createdAt: -1 });
+export const getUsers = async (page, limit) => {
+  const skip = (page - 1) * limit;
+
+  return Promise.all([
+    User.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+    User.countDocuments(),
+  ]);
 };
 
 
 export const getUser = async (id) => {
-  return await User.findById(id).select("-password")
+  return await User.findById(id).select("-password");
 };
 
 export const uptUser = async (id, data) => {
-  return await User.findByIdAndUpdate(id, data)
+  return await User.findByIdAndUpdate(id, data);
 };

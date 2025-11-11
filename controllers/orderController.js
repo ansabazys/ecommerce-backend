@@ -124,10 +124,20 @@ export const getOrders = async (req, res) => {
   }
 };
 
+
+
 export const adminGetOrders = async (req, res) => {
   try {
-    const orders = await getOrdersAdmin();
-    res.status(200).json(orders);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8 ;
+
+    const [orders, ordersCount] = await getOrdersAdmin(page, limit);
+    const totalPages = Math.ceil(ordersCount / limit);
+    if (ordersCount > 0) {
+      return res.status(200).json({ orders, totalPages, ordersCount });
+    }
+
+    res.status(404).json({ message: "No Orders" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

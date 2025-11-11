@@ -9,8 +9,17 @@ import bcrypt from "bcrypt";
 
 export const fetchUsers = async (req, res) => {
   try {
-    const users = await getUsers();
-    res.status(200).json(users);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+
+    const [users, totalCount] = await getUsers(page, limit);
+
+    const totalPages = Math.ceil(totalCount / limit);
+    if (totalCount > 0) {
+      return res.status(200).json({ users, totalPages, totalCount });
+    }
+
+    res.status(404).json({ message: "No Users" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -102,14 +111,14 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     if (req.session) {
-      const role = req.session.user?.role || req.session.admin?.role
-      console.log(role)
+      const role = req.session.user?.role || req.session.admin?.role;
+      console.log(role);
       req.session.destroy((err) => {
         if (err) {
           return res.status(500).json({ message: "Logout failed!" });
         }
         res.clearCookie("connect.sid");
-        res.status(200).json({ message: "Logout successfull!", role: role  });
+        res.status(200).json({ message: "Logout successfull!", role: role });
       });
     } else {
       res.status(404).json({ message: "session not found" }); //
