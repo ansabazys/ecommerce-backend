@@ -50,7 +50,6 @@ router.delete("/delete/:id", checkSuperAdmin, deleteAdmin);
 router.use(checkAdmin);
 
 router.put("/update/:id", updateAdmin);
-router.get("/me", getCurrentAdmin);
 
 //user
 router.get("/users", fetchUsers);
@@ -63,8 +62,8 @@ router.put("/categories/:id", updateCategory);
 router.delete("/categories/:id", deleteCategory);
 
 //products
-router.post("/products", upload.array("images", 5), createProduct);
-router.put("/products/:id", upload.array("images", 5), updateProduct);
+router.post("/products", upload.single("image"), createProduct);
+router.put("/products/:id", upload.single("image"), updateProduct);
 router.delete("/products/:id/:cid", deleteProduct);
 router.get("/products", fetchProducts);
 router.get("/products/:id", fetchProductDetails);

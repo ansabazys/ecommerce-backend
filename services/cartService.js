@@ -17,7 +17,7 @@ export const createCart = async (userId, product, size) => {
 
 export const getCart = async (id) => {
   return await Cart.findOne({ userId: id })
-    .populate("items.productId", "title images price categoryId sizes")
+    .populate("items.productId", "title image price categoryId sizes")
     .sort({ createdAt: -1 });
 };
 

@@ -3,7 +3,7 @@ import {getCurrentUser, loginUser, logoutUser, registerUser} from '../controller
 import { validateUser } from '../middlewares/validate.js'
 import { checkAuth } from '../middlewares/checkAuth.js'
 import checkExist from '../middlewares/checkExist.js'
-import { getCategories, getCategoryProducts } from '../controllers/categoryController.js'
+import { getCategories, getCategoriesById, getCategoryProducts } from '../controllers/categoryController.js'
 import { fetchProduct, fetchProducts, searchProducts } from '../controllers/productController.js'
 const router = express.Router()
 
@@ -17,6 +17,7 @@ router.delete("/logout", checkAuth, logoutUser)
 
 //categories
 router.get("/categories", getCategories)
+// router.get("/categories/:cateId", getCategoriesById)
 router.get("/categories/:id", getCategoryProducts)
 
 //products

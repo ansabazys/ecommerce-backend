@@ -1,3 +1,4 @@
+import { getAdmin } from "../services/adminService.js";
 import {
   createUser,
   getUser,
@@ -39,7 +40,7 @@ export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const resp = await uptUser(id, req.body);
-    console.log(req.body);
+  
     res.status(200).json({ message: "user updated successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -53,7 +54,7 @@ export const updateByUser = async (req, res) => {
     const { status, ...rest } = req.body;
 
     const resp = await uptUser(id, rest);
-    console.log(res);
+    
     res.status(200).json({ message: "user updated successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -62,7 +63,9 @@ export const updateByUser = async (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await getUser(req.session.user._id);
+    const user = req.session.admin
+      ? await getAdmin(req.session.admin._id)
+      : await getUser(req.session.user._id);
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -112,7 +115,7 @@ export const logoutUser = async (req, res) => {
   try {
     if (req.session) {
       const role = req.session.user?.role || req.session.admin?.role;
-      console.log(role);
+   
       req.session.destroy((err) => {
         if (err) {
           return res.status(500).json({ message: "Logout failed!" });

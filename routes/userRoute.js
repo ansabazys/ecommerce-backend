@@ -9,7 +9,7 @@ const router = express.Router()
 router.use(checkUser)
 //cart
 router.get("/cart" ,getCartItems)
-router.post("/cart/:id" ,addToCart)
+router.post("/cart/:id", addToCart)
 router.delete("/cart/:id" ,deleteCartItem)
 router.put("/cart/:id" ,updateCartItem)
 

@@ -28,12 +28,25 @@ export const getCategories = async (req, res) => {
   }
 };
 
+export const getCategoriesById = async (req, res) => {
+  try {
+    const { cateId } = req.params;
+
+    const category = await getCate(cateId);
+    res.status(200).json(category);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const getCategoryProducts = async (req, res) => {
   try {
     const { id } = req.params;
     const page = parseInt(req.query.page) || 1;
 
     const [products, totalCount] = await categoryProducts(id, page);
+
+
 
     const totalPages = Math.ceil(totalCount / 8);
     res.status(200).json({ products, totalPages });
@@ -47,9 +60,8 @@ export const createCategory = async (req, res) => {
     const { title } = req.body;
     const cate = await inspectCategory(title);
 
-
-    if(cate) {
-      return res.status(409).json({error: "You cannot add same category!"})
+    if (cate) {
+      return res.status(409).json({ error: "You cannot add same category!" });
     }
 
     const category = await createCate(req.body);

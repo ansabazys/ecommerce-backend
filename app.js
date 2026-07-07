@@ -15,9 +15,9 @@ connectDB();
 
 app.use(
   cors({
-    origin: true,
+    origin: "http://localhost:5173",
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -39,7 +39,7 @@ app.use(
       httpOnly: true,
       secure: false,
     },
-  })
+  }),
 );
 
 app.use("/", publicRoute);

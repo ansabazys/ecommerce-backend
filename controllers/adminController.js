@@ -26,7 +26,6 @@ export const updateAdmin = async (req, res) => {
       if(role) {
         return res.status(401).json({message: "you are not authenticated"})
       }
-      console.log(data)
       await update(id, data);
       return res.status(200).json({ message: "admin updated successfully" });
     }

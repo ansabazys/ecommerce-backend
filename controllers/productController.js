@@ -10,39 +10,86 @@ import {
   update,
 } from "../services/productService.js";
 import { createViews } from "../services/viewsService.js";
+import { uploadImage } from "../utils/uploadCloudinary.js";
 
 export const createProduct = async (req, res) => {
   try {
-    let { sizes, images, ...rest } = req.body;
-    const newSize = JSON.parse(sizes).map((s) => {
-      return { size: s.size, stock: parseInt(s.stock) };
+    let { sizes, ...rest } = req.body;
+
+    // Parse sizes
+    let parsedSizes = [];
+
+    if (sizes) {
+      try {
+        parsedSizes = typeof sizes === "string" ? JSON.parse(sizes) : sizes;
+
+        parsedSizes = parsedSizes.map((item) => ({
+          size: item.size,
+          stock: Number(item.stock),
+        }));
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid sizes format",
+        });
+      }
+    }
+
+    // Determine stock status
+    rest.stockStatus = parsedSizes.some((item) => item.stock > 0)
+      ? "in stock"
+      : "out of stock";
+
+    // Image is required
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Product image is required",
+      });
+    }
+
+    // Upload image to Cloudinary
+    const uploaded = await uploadImage(req.file.buffer);
+
+    const image = {
+      url: uploaded.secure_url,
+      public_id: uploaded.public_id,
+    };
+
+    // Create product
+    const product = await create({
+      ...rest,
+      image,
+      sizes: parsedSizes,
     });
 
-    const isStock = newSize.some((item) => item.stock > 0);
+    // Update category product count
+    const category = await getCate(rest.categoryId);
 
-    isStock
-      ? (rest.stockStatus = "in stock")
-      : (rest.stockStatus = "out of stock");
+    if (category) {
+      category.productsCount += 1;
+      await category.save();
+    }
 
-    images = req.files.map((file) => file.filename);
-
-    await create({ ...rest, images, sizes: newSize });
-    const category = await getCate(req.body.categoryId);
-
-    category.productsCount++;
-    category.save();
-
-    res.status(201).json({ message: "product created successfully" });
+    return res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      product,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Create Product Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
-
 
 export const fetchProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8 ;
+    const limit = parseInt(req.query.limit) || 8;
 
     const [products, totalCount] = await getProducts(page, limit);
     const totalPages = Math.ceil(totalCount / limit);
@@ -84,46 +131,107 @@ export const fetchProductDetails = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { sizes, ...rest } = req.body;
+    let { sizes, ...rest } = req.body;
 
-    const newSize = JSON.parse(sizes).map((s) => {
-      return { size: s.size, stock: parseInt(s.stock) };
-    });
-
+    // Get existing product
     const product = await getProduct(id);
-    product.sizes = newSize;
 
-    product.save();
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
 
-    const isStock = newSize.some((item) => item.stock > 0);
+    // Parse sizes
+    let parsedSizes = [];
 
-    let images = req.files.map((file) => file.filename);
+    if (sizes) {
+      parsedSizes = typeof sizes === "string" ? JSON.parse(sizes) : sizes;
 
-    isStock
-      ? (rest.stockStatus = "in stock")
-      : (rest.stockStatus = "out of stock");
+      parsedSizes = parsedSizes.map((item) => ({
+        size: item.size,
+        stock: Number(item.stock),
+      }));
+    }
 
-    const pr = await update(id, { newSize, images, ...rest });
+    // Stock status
+    rest.stockStatus = parsedSizes.some((item) => item.stock > 0)
+      ? "in stock"
+      : "out of stock";
 
-    res.status(200).json({ message: "product updated successfully" });
+    const updatePayload = {
+      ...rest,
+      sizes: parsedSizes,
+    };
+
+    // New image uploaded
+    if (req.file) {
+      // Delete old Cloudinary image
+      if (product.image?.public_id) {
+        await cloudinary.uploader.destroy(product.image.public_id);
+      }
+
+      // Upload new image
+      const uploaded = await uploadImage(req.file.buffer);
+
+      updatePayload.image = {
+        url: uploaded.secure_url,
+        public_id: uploaded.public_id,
+      };
+    }
+
+    const updatedProduct = await update(id, updatePayload);
+
+    return res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 export const deleteProduct = async (req, res) => {
   try {
     const { id, cid } = req.params;
-    const result = await remove(id);
-    if (result === null)
-      return res.status(409).json({ message: "product already deleted" });
+
+    const product = await getProduct(id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    // Delete image from Cloudinary
+    if (product.image?.public_id) {
+      await cloudinary.uploader.destroy(product.image.public_id);
+    }
+
+    await remove(id);
 
     const category = await getCate(cid);
-    category.productsCount--;
-    category.save();
-    res.status(200).json({ message: "product deleted successfully" });
+
+    if (category) {
+      category.productsCount--;
+      await category.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

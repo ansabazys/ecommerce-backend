@@ -22,8 +22,6 @@ export const createOrder = async (req, res) => {
     const user = await getUser(userId);
     const { totalAmount, items } = cart;
 
-    console.log(address)
-
     user.address = address;
 
     const order = await createOdr(userId);
@@ -54,8 +52,6 @@ export const createOrder = async (req, res) => {
         res.status(400).json({ error: error.message });
       }
     });
-
-    console.log(order);
 
     await user.save();
     await order.save();

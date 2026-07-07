@@ -21,7 +21,6 @@ export const addToCart = async (req, res) => {
     );
 
     if (itemIndex > -1) {
-      console.log(cart.items[itemIndex]);
       cart.items[itemIndex].quantity += 1;
     } else {
       cart.items.push({
@@ -91,8 +90,6 @@ export const updateCartItem = async (req, res) => {
     const cart = await getCart(userId);
 
     const { quantity } = req.body;
-
-    console.log(quantity)
 
     if (quantity) {
       cart.items.map((item) => {
