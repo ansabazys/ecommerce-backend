@@ -15,7 +15,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.CORS_URL],
+    origin: ["http://localhost:5173", "https://jacstudios.vercel.app"],
     credentials: true,
   }),
 );
