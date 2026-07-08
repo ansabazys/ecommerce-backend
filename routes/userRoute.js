@@ -6,7 +6,7 @@ import { updateByUser } from '../controllers/userController.js'
 
 const router = express.Router()
 
-router.use(checkUser)
+// router.use(checkUser)
 //cart
 router.get("/cart" ,getCartItems)
 router.post("/cart/:id", addToCart)
