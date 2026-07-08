@@ -1,3 +1,4 @@
+import cloudinary from "../config/cloudinary.js";
 import { getCate, updateCate } from "../services/categoryService.js";
 import {
   categoryProducts,
